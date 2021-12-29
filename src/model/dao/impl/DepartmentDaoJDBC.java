@@ -12,6 +12,7 @@ import java.util.Map;
 
 import db.DB;
 import db.DbException;
+import db.DbIntegrityException;
 import model.dao.DepartmentDao;
 import model.entites.Department;
 
@@ -61,14 +62,43 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
 	@Override
 	public void update(Department dep) {
-		// TODO Auto-generated method stub
-
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement(
+					"UPDATE department "
+					+ "SET Name = ? "
+					+"WHERE Id = ?");
+			
+			st.setString(1, dep.getName());
+			st.setInt(2, dep.getId());
+			
+			st.executeUpdate();
+		}
+		catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
 	public void deleteById(Integer Id) {
-		// TODO Auto-generated method stub
-
+		PreparedStatement st = null;
+		try {
+			st = conn.prepareStatement(
+					"DELETE FROM department WHERE Id = ?");
+			
+			st.setInt(1, Id);
+			
+			st.executeUpdate();
+		}
+		catch (SQLException e) {
+			throw new DbIntegrityException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
